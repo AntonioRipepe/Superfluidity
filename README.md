@@ -1,7 +1,7 @@
 # superfluidity
-Unicode 2021 Hackathon superfluidity pools
+Unicode 2021 Hackathon Grand Finalist
 
-A superfluidity pool automatically streams liquidity between concentrated liquidity pools based on price velocity in order to maximize profits.
+Superfluidity is a tool to automatically stream liquidity between liquidity positions based on price velocity in order to maximize profits.
 
 Similar to grid trading strategies, superfluidity pools take advantage of the relatively bounded liquidity during consolidation following price movements. Following the same logic as concentrated liquidity pools, relatively little capital is needed outside of the current price range in order to fulfill liquidity requirements 
 during price movements. However, having liquidity within the range first is a major advantage over other liquidity providers, resulting in higher returns. 
