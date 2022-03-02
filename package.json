@@ -6,6 +6,11 @@
   "dependencies": {
     "@metamask/detect-provider": "^1.2.0",
     "ethers": "^5.5.1",
-    "web3-utils": "^1.6.0"
+    "web3-utils": "^1.6.0",
+    "chai": "^4.3.6",
+    "chai-as-promised": "^7.1.1",
+    "core-js": "^3.21.0",
+    "node-js": "^1.0.0",
+    "solc-js": "^1.0.1"
   }
 }
