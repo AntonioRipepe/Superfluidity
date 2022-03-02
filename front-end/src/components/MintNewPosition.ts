@@ -7,16 +7,25 @@ import {
     nearestUsableTick
   } from '@uniswap/v3-sdk/'
 
-import  { hexToNumberString }  from 'web3-utils'
-import { ethers } from "ethers";
-import { Percent, Token, CurrencyAmount, BigintIsh } from "@uniswap/sdk-core";
-import { abi as IUniswapV3PoolABI } from "@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json";
+// import JSBI from 'jsbi';
+// export declare type BigintIsh = JSBI | string | number;
 
+// import  { hexToNumberString }  from 'web3-utils'
+import { ethers } from "ethers";
+
+import{ 
+    Percent, 
+    Token
+} from "@uniswap/sdk-core";
+
+import type { BigintIsh } from "@uniswap/sdk-core";
+
+import { abi as IUniswapV3PoolABI } from "@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json";
 
 // default uses “http://localhost:8545”
 // can also input your own connection with "https://mainnet.infura.io/v3/<YOUR-ENDPOINT-HERE>" as an input
-const ganache = require("ganache-cli");
-const provider = new ethers.providers.Web3Provider(ganache.provider());
+// const ganache = require("ganache-cli");
+// const provider = new ethers.providers.Web3Provider(ganache.provider());
 //const provider = new ethers.providers.JsonRpcProvider("https://rinkeby.infura.io/v3/23b1b337c10147208b4cf43ebfd3c2e7");
 
 // pool address for WETH/DAI 1.0% rinkeby testnet
@@ -26,13 +35,6 @@ const provider = new ethers.providers.Web3Provider(ganache.provider());
 //const poolAddress = "0x1F98431c8aD98523631AE4a59f267346ea31F984";
 
 // pool address for mainnet WETH USDC
-const poolAddress = "0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8";
-
-const poolContract = new ethers.Contract(
-  poolAddress,
-  IUniswapV3PoolABI,
-  provider
-);
 
 interface Immutables {
   factory: string;
@@ -54,7 +56,7 @@ interface State {
   unlocked: boolean;
 }
 
-async function getPoolImmutables() {
+async function getPoolImmutables(poolContract: ethers.Contract) {
   const immutables: Immutables = {
     factory: await poolContract.factory(),
     token0: await poolContract.token0(),
@@ -66,7 +68,7 @@ async function getPoolImmutables() {
   return immutables;
 }
 
-async function getPoolState() {
+async function getPoolState(poolContract: ethers.Contract) {
   const slot = await poolContract.slot0();
   const PoolState: State = {
     liquidity: await poolContract.liquidity(),
@@ -82,9 +84,18 @@ async function getPoolState() {
 }
 
 
-async function mintNewLiquidityPosition(sender: string, usdc_amount: BigintIsh, weth_amount: BigintIsh, lowerTick: number, upperTick: number)  {  
-  const immutables = await getPoolImmutables();
-  const state = await getPoolState();
+async function mintNewLiquidityPosition(sender: string, usdc_amount: BigintIsh, weth_amount: BigintIsh, lowerTick: number, upperTick: number, provider: ethers.providers.Web3Provider) {
+    // TODO: Implement multiple pool addresses and switch through them using input variables
+    const poolAddress = "0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8";
+
+    const poolContract = new ethers.Contract(
+        poolAddress,
+        IUniswapV3PoolABI,
+        provider
+    );
+
+  const immutables = await getPoolImmutables(poolContract);
+  const state = await getPoolState(poolContract);
   const USDC = new Token(1, immutables.token0, 18, "USDC", "USD Coin");
   const WETH = new Token(1, immutables.token1, 18, "WETH", "Wrapped Ether");
   const block = await provider.getBlock(provider.getBlockNumber());
@@ -122,21 +133,21 @@ async function mintNewLiquidityPosition(sender: string, usdc_amount: BigintIsh, 
         deadline: deadline
         });
     console.log(`${sender} is adding a position with ${value} ETH`);
-    console.log( value);
-    console.log(hexToNumberString(calldata));
+    console.log(value);
+    console.log(calldata);
 
     //console.log(calldata);
   
   }
 
-  async function main() {
+  export async function main(sender: string, usdc_amount: string, weth_amount: string, lowerTick: number, upperTick: number, provider: ethers.providers.Web3Provider) {
     
-    const sender = "0x616caD18642F45d3fa5FCaaD0a2d81764A9cBa84";
-    const usdc_amount = "1000000000000000000";
-    const weth_amount = "1000000000000000000";
-    const lowerTick = 0;
-    const upperTick = 0;
-    await mintNewLiquidityPosition(sender, usdc_amount, weth_amount, lowerTick, upperTick);
+    // const sender = "0x616caD18642F45d3fa5FCaaD0a2d81764A9cBa84";
+    // const usdc_amount = "1000000000000000000";
+    // const weth_amount = "1000000000000000000";
+    // const lowerTick = 0;
+    // const upperTick = 0;
+    await mintNewLiquidityPosition(sender, usdc_amount, weth_amount, lowerTick, upperTick, provider);
   }
   
-  main();
+//    main;
